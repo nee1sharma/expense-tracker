@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/dashboardFragment">
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.hitstudio.expensetracker.ui.dashboard.DashboardFragment"
+        android:label="Dashboard" />
+
+    <fragment
+        android:id="@+id/loggerFragment"
+        android:name="com.hitstudio.expensetracker.ui.logger.LoggerFragment"
+        android:label="Log" />
+
+    <fragment
+        android:id="@+id/expenseListFragment"
+        android:name="com.hitstudio.expensetracker.ui.list.ExpenseListFragment"
+        android:label="History" />
+
+    <fragment
+        android:id="@+id/periodFragment"
+        android:name="com.hitstudio.expensetracker.ui.period.PeriodFragment"
+        android:label="Periods" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.hitstudio.expensetracker.ui.settings.SettingsFragment"
+        android:label="Settings" />
+
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.hitstudio.expensetracker.ui.about.AboutFragment"
+        android:label="About" />
+</navigation>

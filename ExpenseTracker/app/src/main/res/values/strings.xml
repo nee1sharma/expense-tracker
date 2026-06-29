@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Expense Tracker</string>
+    <string name="app_description">A local-first personal expense tracker for fast logging, clear summaries, and private spending history.</string>
+</resources>
