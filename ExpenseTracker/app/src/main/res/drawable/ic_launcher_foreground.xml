@@ -5,11 +5,11 @@
     android:viewportHeight="108">
     <!-- Wallet body -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M29,42h50c3,0 5,2 5,5v18c0,3 -2,5 -5,5h-50c-3,0 -5,-2 -5,-5v-18c0,-3 2,-5 5,-5z" />
+        android:fillColor="#4169E1"
+        android:pathData="M29,38h50c3,0 5,2 5,8v22c0,3 -2,5 -5,5h-50c-3,0 -5,-2 -5,-5v-18c0,-3 2,-5 5,-5z" />
     <!-- Wallet flap -->
     <path
-        android:fillColor="#E8F5E9"
+        android:fillColor="#11F5E9"
         android:pathData="M70,48h14v10h-14c-1.5,0 -2.5,-1 -2.5,-2.5v-5c0,-1.5 1,-2.5 2.5,-2.5z" />
     <!-- Flap button -->
     <path

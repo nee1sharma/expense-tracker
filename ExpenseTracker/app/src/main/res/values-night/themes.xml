@@ -1,13 +1,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.ExpenseTracker" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">#77D7C8</item>
-        <item name="colorOnPrimary">#003731</item>
-        <item name="colorPrimaryContainer">#005047</item>
-        <item name="colorOnPrimaryContainer">#A3F2E5</item>
-        <item name="colorSecondary">#FFB95C</item>
-        <item name="colorSecondaryContainer">#663800</item>
-        <item name="colorTertiary">#ADC6FF</item>
-        <item name="android:navigationBarColor">#101412</item>
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorOnPrimary">@color/brand_on_primary</item>
+        <item name="colorPrimaryContainer">@color/brand_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/brand_on_primary_container</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <item name="colorSecondaryContainer">@color/brand_secondary_container</item>
+        <item name="colorTertiary">@color/brand_tertiary</item>
+        <item name="android:colorBackground">@color/surface_background</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 </resources>

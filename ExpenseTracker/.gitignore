@@ -65,3 +65,6 @@ keystore.properties
 
 # Google Services
 google-services.json
+
+# Documentation
+docs/
