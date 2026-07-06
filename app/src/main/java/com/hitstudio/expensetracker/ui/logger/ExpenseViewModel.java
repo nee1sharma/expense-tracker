@@ -18,6 +18,8 @@ public class ExpenseViewModel extends ViewModel {
     private final AppContainer container;
     private final MutableLiveData<Result<Long>> saveResult = new MutableLiveData<>();
     private final MutableLiveData<Expense> editingExpense = new MutableLiveData<>();
+    private final MutableLiveData<Expense> suggestedExpense = new MutableLiveData<>();
+    private final MutableLiveData<List<String>> recentReasons = new MutableLiveData<>();
 
     public ExpenseViewModel(AppContainer container) {
         this.container = container;
@@ -32,6 +34,33 @@ public class ExpenseViewModel extends ViewModel {
 
     public LiveData<Expense> getEditingExpense() {
         return editingExpense;
+    }
+
+    public LiveData<Expense> getSuggestedExpense() {
+        return suggestedExpense;
+    }
+
+    public LiveData<List<String>> getRecentReasons() {
+        return recentReasons;
+    }
+
+    public void loadRecentReasons() {
+        container.executors.diskIO().execute(() -> {
+            List<String> reasons = container.expenseReader.getRecentReasons(5);
+            container.executors.mainThread().execute(() -> recentReasons.setValue(reasons));
+        });
+    }
+
+    public void findSuggestion(String reason) {
+        if (reason == null || reason.trim().isEmpty()) {
+            return;
+        }
+        container.executors.diskIO().execute(() -> {
+            Expense latest = container.expenseReader.getLatestByReason(reason.trim());
+            if (latest != null) {
+                container.executors.mainThread().execute(() -> suggestedExpense.setValue(latest));
+            }
+        });
     }
 
     public void loadExpense(long id) {

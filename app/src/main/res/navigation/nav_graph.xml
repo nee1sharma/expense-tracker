@@ -30,6 +30,11 @@
         android:label="Settings" />
 
     <fragment
+        android:id="@+id/categorySettingsFragment"
+        android:name="com.hitstudio.expensetracker.ui.settings.CategorySettingsFragment"
+        android:label="Categories" />
+
+    <fragment
         android:id="@+id/aboutFragment"
         android:name="com.hitstudio.expensetracker.ui.about.AboutFragment"
         android:label="About" />

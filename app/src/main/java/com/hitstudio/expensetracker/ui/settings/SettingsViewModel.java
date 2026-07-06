@@ -63,6 +63,25 @@ public class SettingsViewModel extends ViewModel {
         });
     }
 
+    public void updateCategory(Category category, String rawName) {
+        String name = rawName == null ? "" : rawName.trim();
+        if (name.isEmpty()) {
+            message.setValue(Result.error("Category name is required."));
+            return;
+        }
+        container.executors.diskIO().execute(() -> {
+            Category existing = container.categoryReader.getByName(name);
+            if (existing != null && existing.id != category.id) {
+                container.executors.mainThread().execute(() -> message.setValue(Result.error("Category name already exists.")));
+                return;
+            }
+            category.name = name;
+            category.updatedAt = System.currentTimeMillis();
+            container.categoryWriter.update(category);
+            container.executors.mainThread().execute(() -> message.setValue(Result.success("Category updated.")));
+        });
+    }
+
     public void setCategoryActive(Category category, boolean active) {
         if (category == null) {
             return;

@@ -16,4 +16,6 @@ public interface ExpenseReader {
     List<Expense> getInRange(DateRange range);
     List<Expense> getAll();
     Expense getById(long id);
+    Expense getLatestByReason(String reason);
+    List<String> getRecentReasons(int limit);
 }

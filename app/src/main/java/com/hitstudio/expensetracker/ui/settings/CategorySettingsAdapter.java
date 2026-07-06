@@ -22,6 +22,7 @@ public class CategorySettingsAdapter extends RecyclerView.Adapter<CategorySettin
     public interface Listener {
         void onActiveChanged(Category category, boolean active);
         void onMove(Category category, int direction);
+        void onEdit(Category category);
     }
 
     private final Listener listener;
@@ -59,6 +60,7 @@ public class CategorySettingsAdapter extends RecyclerView.Adapter<CategorySettin
         holder.downButton.setEnabled(position < categories.size() - 1);
         holder.upButton.setOnClickListener(v -> listener.onMove(category, -1));
         holder.downButton.setOnClickListener(v -> listener.onMove(category, 1));
+        holder.itemView.setOnClickListener(v -> listener.onEdit(category));
     }
 
     @Override

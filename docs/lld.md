@@ -264,6 +264,12 @@ Hosts: Dashboard, Logger, Periods (stub P1), Settings; Notes (P4); About (P1).
 | **Depends on**     | `ExpenseWriter`, `CategoryReader`, `AppPreferences`; `TagReader`/`TagWriter` (P2), `AttachmentWriter` (P3); `LoggerFormState` → `Expense` |
 | **Phase**          | P1 (P2 tags, P3 photos)                                                                                                                   |
 
+**Key Behaviors:**
+- **Reason-driven automation (P1)**: Entering a Reason (with top-5 recent suggestions) automatically populates Payee, Location, and Category based on the most recent matching entry in history.
+- **Simplified UI (P1)**: Removed "Type" selection (defaults to Expense) and "Notes" field for faster entry.
+- **Integrated Date/Time (P1)**: Chained pickers allow selecting both date and time in a single flow from the date field.
+- **Prioritized Layout**: Optimized for high-intent flow: Amount → Reason → Payee → Date/Time → Payment Method → Category → Location.
+
 
 ---
 
@@ -298,8 +304,8 @@ May live on Dashboard or separate screen — same VM dependencies.
 
 |                    |                                                                                                                                                                                 |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Responsibility** | Currency, default payment method, categories, about (P1); theme, app lock, backup, export/import (P2); templates, recurring (P3); future reminders, budgets, goals (P4+) |
-| **Depends on**     | `CategoryReader`/`CategoryWriter`, `AppPreferences`; export/import, `BackupService`, `AppLockManager`, `ThemeController` (P2); template/recurring/reminder/budget/goal services |
+| **Responsibility** | Currency, default payment method, categories navigation (P1); theme, app lock, backup, export/import (P2); templates, recurring (P3); future reminders, budgets, goals (P4+) |
+| **Depends on**     | `AppPreferences`; export/import, `BackupService`, `AppLockManager`, `ThemeController` (P2); template/recurring/reminder/budget/goal services |
 | **Phase**          | P1 (settings); P2+ (per feature)                                                                                                                                                |
 
 
@@ -392,6 +398,14 @@ A simple About page opened from Settings showing app identity and version, with 
 - **Depends on**: `BuildConfig`, `Intent` — no repository, DB, or new permission.
 - **Reached from**: `SettingsFragment` (Settings → About).
 
+### 3.15 CategorySettingsFragment (P1)
+
+Dedicated screen for managing expense categories, reached from Settings.
+
+- **Responsibility**: Add new categories via clickable card; edit existing names via dialog; toggle visibility (active status); reorder categories.
+- **UI**: RecyclerView with selectable items for editing; drag/move buttons.
+- **Depends on**: `CategoryReader`, `CategoryWriter`, `SettingsViewModel`.
+
 ---
 
 ## 4. Repository components (UI-facing)
@@ -407,6 +421,9 @@ interface ExpenseReader {
    LiveData<DashboardSummary> observeDashboard();
    List<Expense> getInRange(DateRange range);
    List<Expense> getAll();
+   Expense getById(long id);
+   Expense getLatestByReason(String reason);                          // P1 autofill
+   List<String> getRecentReasons(int limit);                          // P1 suggestions
    PeriodSummary getPeriodSummary(PeriodType type, long anchorMillis);  // P2
    LiveData<List<Expense>> observe(ExpenseQuery query);                 // P2 search/filter
    Money getMatchedTotal(ExpenseQuery query);                           // P2 running total

@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.hitstudio.expensetracker.ExpenseTrackerApplication;
@@ -44,12 +45,10 @@ public class LoggerFragment extends Fragment {
     private AppContainer container;
     private TextInputLayout amountLayout;
     private TextInputEditText amountInput;
-    private TextInputEditText reasonInput;
+    private MaterialAutoCompleteTextView reasonInput;
     private TextInputEditText payeeInput;
     private TextInputEditText locationInput;
-    private TextInputEditText notesInput;
     private TextInputEditText dateInput;
-    private Spinner typeSpinner;
     private Spinner categorySpinner;
     private Spinner paymentSpinner;
     private ArrayAdapter<String> categoryAdapter;
@@ -82,15 +81,38 @@ public class LoggerFragment extends Fragment {
         updateDateText();
 
         dateInput.setOnClickListener(v -> pickDate());
-        view.findViewById(R.id.logger_pick_date_button).setOnClickListener(v -> pickDate());
-        view.findViewById(R.id.logger_pick_time_button).setOnClickListener(v -> pickTime());
         view.findViewById(R.id.logger_save_button).setOnClickListener(v -> save());
 
+        reasonInput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                viewModel.findSuggestion(text(reasonInput));
+            } else {
+                reasonInput.showDropDown();
+            }
+        });
+
+        reasonInput.setOnItemClickListener((parent, v, position, id) -> {
+            String selected = (String) parent.getItemAtPosition(position);
+            viewModel.findSuggestion(selected);
+        });
+
         viewModel.categories.observe(getViewLifecycleOwner(), this::bindCategories);
+        viewModel.getRecentReasons().observe(getViewLifecycleOwner(), reasons -> {
+            if (reasons != null && !reasons.isEmpty()) {
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
+                        android.R.layout.simple_dropdown_item_1line, reasons);
+                reasonInput.setAdapter(adapter);
+            }
+        });
         viewModel.getEditingExpense().observe(getViewLifecycleOwner(), expense -> {
             editingExpense = expense;
             if (expense != null) {
                 bindExpense(expense);
+            }
+        });
+        viewModel.getSuggestedExpense().observe(getViewLifecycleOwner(), suggestion -> {
+            if (suggestion != null) {
+                applySuggestion(suggestion);
             }
         });
         viewModel.getSaveResult().observe(getViewLifecycleOwner(), result -> {
@@ -121,6 +143,7 @@ public class LoggerFragment extends Fragment {
         super.onResume();
         if (viewModel != null) {
             viewModel.refreshCategories();
+            viewModel.loadRecentReasons();
         }
     }
 
@@ -130,16 +153,12 @@ public class LoggerFragment extends Fragment {
         reasonInput = view.findViewById(R.id.logger_reason);
         payeeInput = view.findViewById(R.id.logger_payee);
         locationInput = view.findViewById(R.id.logger_location);
-        notesInput = view.findViewById(R.id.logger_notes);
         dateInput = view.findViewById(R.id.logger_date);
-        typeSpinner = view.findViewById(R.id.logger_type_spinner);
         categorySpinner = view.findViewById(R.id.logger_category_spinner);
         paymentSpinner = view.findViewById(R.id.logger_payment_spinner);
     }
 
     private void setupSpinners() {
-        typeSpinner.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item,
-                new String[]{"Expense", "Income"}));
         paymentSpinner.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item,
                 displayPayments()));
         categoryAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, new ArrayList<>());
@@ -170,16 +189,27 @@ public class LoggerFragment extends Fragment {
 
     private void bindExpense(Expense expense) {
         amountInput.setText(String.format(Locale.US, "%.2f", expense.amountMinor / 100.0d));
-        typeSpinner.setSelection(expense.transactionType.ordinal());
         paymentSpinner.setSelection(expense.paymentMethod.ordinal());
         reasonInput.setText(expense.reason);
         payeeInput.setText(expense.payee);
         locationInput.setText(expense.locationText);
-        notesInput.setText(expense.notes);
         occurredAt.setTimeInMillis(expense.occurredAt);
         updateDateText();
         if (!selectCategory(expense.categoryId)) {
             pendingCategoryId = expense.categoryId;
+        }
+    }
+
+    private void applySuggestion(Expense suggestion) {
+        if (text(payeeInput).isEmpty() && suggestion.payee != null) {
+            payeeInput.setText(suggestion.payee);
+        }
+        if (text(locationInput).isEmpty() && suggestion.locationText != null) {
+            locationInput.setText(suggestion.locationText);
+        }
+        // If user hasn't manually picked a category (or it's the first one), suggest the previous one
+        if (suggestion.categoryId > 0) {
+            selectCategory(suggestion.categoryId);
         }
     }
 
@@ -217,7 +247,7 @@ public class LoggerFragment extends Fragment {
         AppSettings settings = container.preferences.getSettings();
         expense.amountMinor = amountMinor;
         expense.currencyCode = settings.defaultCurrencyCode;
-        expense.transactionType = typeSpinner.getSelectedItemPosition() == 1 ? TransactionType.INCOME : TransactionType.EXPENSE;
+        expense.transactionType = TransactionType.EXPENSE;
         expense.paymentMethod = PaymentMethod.values()[paymentSpinner.getSelectedItemPosition()];
         expense.categoryId = category.id;
         expense.categoryName = category.name;
@@ -225,7 +255,6 @@ public class LoggerFragment extends Fragment {
         expense.reason = text(reasonInput);
         expense.payee = text(payeeInput);
         expense.locationText = text(locationInput);
-        expense.notes = text(notesInput);
         expense.occurredAt = occurredAt.getTimeInMillis();
         expense.source = ExpenseSource.MANUAL;
         expense.syncStatus = SyncStatus.LOCAL_ONLY;
@@ -245,8 +274,15 @@ public class LoggerFragment extends Fragment {
         }
     }
 
-    private String text(TextInputEditText editText) {
-        return editText.getText() == null ? "" : editText.getText().toString().trim();
+    private String text(View view) {
+        if (view instanceof TextInputEditText) {
+            TextInputEditText et = (TextInputEditText) view;
+            return et.getText() == null ? "" : et.getText().toString().trim();
+        } else if (view instanceof MaterialAutoCompleteTextView) {
+            MaterialAutoCompleteTextView tv = (MaterialAutoCompleteTextView) view;
+            return tv.getText() == null ? "" : tv.getText().toString().trim();
+        }
+        return "";
     }
 
     private String[] displayPayments() {
@@ -266,6 +302,7 @@ public class LoggerFragment extends Fragment {
                     occurredAt.set(Calendar.MONTH, month);
                     occurredAt.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                     updateDateText();
+                    pickTime();
                 },
                 occurredAt.get(Calendar.YEAR),
                 occurredAt.get(Calendar.MONTH),

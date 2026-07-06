@@ -43,6 +43,14 @@ public interface ExpenseDao {
             "WHERE e.id = :id AND e.deleted = 0 LIMIT 1")
     ExpenseRecord getById(long id);
 
+    @Query("SELECT e.*, c.name AS categoryName, c.colorHex AS categoryColorHex " +
+            "FROM expenses e LEFT JOIN categories c ON c.id = e.categoryId " +
+            "WHERE e.reason = :reason AND e.deleted = 0 ORDER BY e.occurredAt DESC LIMIT 1")
+    ExpenseRecord getLatestByReason(String reason);
+
+    @Query("SELECT DISTINCT reason FROM expenses WHERE reason IS NOT NULL AND reason != '' AND deleted = 0 ORDER BY occurredAt DESC LIMIT :limit")
+    List<String> getRecentReasons(int limit);
+
     @Query("SELECT COUNT(*) FROM expenses WHERE deleted = 0")
     int count();
 

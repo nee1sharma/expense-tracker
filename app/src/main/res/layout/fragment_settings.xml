@@ -50,9 +50,12 @@
             android:text="Save settings" />
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/settings_categories_nav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
+            android:clickable="true"
+            android:focusable="true"
             app:cardBackgroundColor="@color/surface_soft"
             app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
@@ -64,58 +67,35 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="20dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Categories"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/settings_categories_toggle"
-                    style="?attr/materialIconButtonStyle"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:minWidth="44dp"
-                    android:minHeight="44dp"
-                    android:rotation="180"
-                    android:contentDescription="@string/settings_categories_collapse"
-                    app:backgroundTint="@color/surface_variant"
-                    app:cornerRadius="22dp"
-                    app:icon="@drawable/ic_expand_more"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    app:iconSize="20dp"
-                    app:iconTint="@color/brand_primary" />
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Categories"
+                        android:textAppearance="?attr/textAppearanceTitleLarge"
+                        android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/settings_categories_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Manage your expense categories"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?android:attr/textColorSecondary" />
+                </LinearLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/settings_add_category"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/settings_add_category"
-                    app:icon="@drawable/ic_add"
-                    app:iconGravity="textStart"
-                    app:iconPadding="8dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/settings_category_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:nestedScrollingEnabled="false" />
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_expand_more"
+                    android:rotation="-90"
+                    app:tint="@color/brand_primary" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

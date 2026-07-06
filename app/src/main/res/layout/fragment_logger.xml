@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log transaction"
+            android:text="Log expense"
             android:textAppearance="?attr/textAppearanceHeadlineMedium"
             android:textStyle="bold" />
 
@@ -22,7 +22,7 @@
             android:id="@+id/logger_amount_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="20dp"
             android:hint="Amount">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -33,99 +33,28 @@
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:text="Type"
-            android:textAppearance="?attr/textAppearanceLabelLarge" />
-
-        <Spinner
-            android:id="@+id/logger_type_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="48dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:text="Category"
-            android:textAppearance="?attr/textAppearanceLabelLarge" />
-
-        <Spinner
-            android:id="@+id/logger_category_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="48dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:text="Payment method"
-            android:textAppearance="?attr/textAppearanceLabelLarge" />
-
-        <Spinner
-            android:id="@+id/logger_payment_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="48dp" />
-
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/logger_reason_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:hint="Date and time">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/logger_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:inputType="none"
-                android:maxLines="1" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/logger_pick_date_button"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:text="Pick date" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/logger_pick_time_button"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:text="Pick time" />
-        </LinearLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="16dp"
             android:hint="Reason">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/logger_reason"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:completionThreshold="1"
                 android:inputType="textCapSentences"
                 android:maxLength="120"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/logger_payee_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
             android:hint="Payee">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -138,6 +67,38 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/logger_date_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Date and time"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/ic_period">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/logger_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Category"
+            android:textAppearance="?attr/textAppearanceLabelLarge" />
+
+        <Spinner
+            android:id="@+id/logger_category_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/logger_location_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -152,26 +113,23 @@
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:hint="Notes">
+            android:layout_marginTop="16dp"
+            android:text="Payment method"
+            android:textAppearance="?attr/textAppearanceLabelLarge" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/logger_notes"
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:gravity="top"
-                android:inputType="textMultiLine|textCapSentences"
-                android:maxLength="500" />
-        </com.google.android.material.textfield.TextInputLayout>
+        <Spinner
+            android:id="@+id/logger_payment_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/logger_save_button"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="24dp"
             android:text="Save transaction" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

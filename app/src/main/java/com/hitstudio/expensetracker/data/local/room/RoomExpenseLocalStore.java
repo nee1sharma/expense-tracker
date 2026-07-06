@@ -48,6 +48,16 @@ public class RoomExpenseLocalStore implements ExpenseLocalReader, ExpenseLocalWr
     }
 
     @Override
+    public Expense getLatestByReason(String reason) {
+        return ExpenseEntityMapper.fromRecord(dao.getLatestByReason(reason));
+    }
+
+    @Override
+    public List<String> getRecentReasons(int limit) {
+        return dao.getRecentReasons(limit);
+    }
+
+    @Override
     public int count() {
         return dao.count();
     }

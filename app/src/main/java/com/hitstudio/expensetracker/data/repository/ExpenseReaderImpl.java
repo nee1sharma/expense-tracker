@@ -67,4 +67,14 @@ public class ExpenseReaderImpl implements ExpenseReader {
     public Expense getById(long id) {
         return storageRegistry.getExpenseLocalReader().getById(id);
     }
+
+    @Override
+    public Expense getLatestByReason(String reason) {
+        return storageRegistry.getExpenseLocalReader().getLatestByReason(reason);
+    }
+
+    @Override
+    public List<String> getRecentReasons(int limit) {
+        return storageRegistry.getExpenseLocalReader().getRecentReasons(limit);
+    }
 }
