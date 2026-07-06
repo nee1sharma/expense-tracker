@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Expense Tracker</string>
+    <string name="app_description">A local-first personal expense tracker for fast logging, clear summaries, and private spending history.</string>
+    <string name="reminder_channel_name">Expense reminders</string>
+    <string name="reminder_channel_description">Daily reminders to add your expenses.</string>
+    <string name="reminder_notification_title">Time to log your expenses</string>
+    <string name="reminder_notification_text">You have not added any expenses today. Tap to add one now.</string>
+    <string name="settings_add_category">Add category</string>
+    <string name="settings_categories_expand">Expand categories</string>
+    <string name="settings_categories_collapse">Collapse categories</string>
+    <string name="category_move_up">Move category up</string>
+    <string name="category_move_down">Move category down</string>
+</resources>

@@ -1,0 +1,30 @@
+# Built artifacts
+bin/
+gen/
+out/
+build/
+.gradle/
+app/build/
+
+# IDE files
+.idea/
+*.iml
+*.iws
+.project
+.classpath
+.settings/
+
+# Local configuration
+local.properties
+keystore.properties
+
+# Signing files
+*.jks
+*.keystore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Captures
+captures/
