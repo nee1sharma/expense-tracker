@@ -15,4 +15,11 @@
     <string name="period_title">History</string>
     <string name="period_no_tracking_data">No tracking data yet.</string>
     <string name="period_month_empty">No expenses added for this month.</string>
+    <string name="period_months_label">Months</string>
+    <string name="period_select_month_prompt">Select a month to view summary and history.</string>
+    <string name="period_selected_month_label">Selected month</string>
+    <string name="period_category_breakdown_title">Category details</string>
+    <string name="period_no_category_data">No category expenses for this month.</string>
+    <string name="period_expense_history_title">Expense history</string>
+    <string name="period_no_month_history">No entries for this month.</string>
 </resources>

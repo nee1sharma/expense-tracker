@@ -1,6 +1,21 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
 }
+
+val versionPropsFile = rootProject.file("version.properties")
+val versionProps = Properties().apply {
+    if (versionPropsFile.exists()) {
+        load(FileInputStream(versionPropsFile))
+    }
+}
+
+val verMajor = versionProps.getProperty("VERSION_MAJOR", "1").toInt()
+val verMinor = versionProps.getProperty("VERSION_MINOR", "0").toInt()
+val verPatch = versionProps.getProperty("VERSION_PATCH", "0").toInt()
+val verBuild = versionProps.getProperty("VERSION_BUILD", "1").toInt()
 
 android {
     namespace = "com.hitstudio.expensetracker"
@@ -14,8 +29,8 @@ android {
         applicationId = "com.hitstudio.expensetracker"
         minSdk = 34
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = verBuild
+        versionName = "$verMajor.$verMinor.$verPatch"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -36,6 +51,19 @@ android {
     }
     buildFeatures {
         buildConfig = true
+    }
+}
+
+tasks.register("incrementBuildNumber") {
+    doLast {
+        val props = Properties()
+        if (versionPropsFile.exists()) {
+            props.load(FileInputStream(versionPropsFile))
+        }
+        val currentBuild = props.getProperty("VERSION_BUILD", "0").toInt()
+        props.setProperty("VERSION_BUILD", (currentBuild + 1).toString())
+        props.store(versionPropsFile.writer(), "Auto-incremented build number")
+        println("Build number incremented to ${currentBuild + 1}")
     }
 }
 

@@ -10,24 +10,28 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hitstudio.expensetracker.ExpenseTrackerApplication;
 import com.hitstudio.expensetracker.R;
 import com.hitstudio.expensetracker.ui.common.AppViewModelFactory;
-import com.hitstudio.expensetracker.ui.list.ExpenseListFragment;
+import com.hitstudio.expensetracker.ui.list.ExpenseHistoryAdapter;
 import com.hitstudio.expensetracker.util.MoneyFormatter;
 
 public class PeriodFragment extends Fragment {
     private PeriodViewModel viewModel;
     private PeriodMonthAdapter monthAdapter;
+    private PeriodCategoryAdapter categoryAdapter;
+    private ExpenseHistoryAdapter expenseAdapter;
     private View contentView;
     private TextView emptyView;
+    private View detailView;
+    private TextView promptView;
     private TextView selectedLabel;
     private TextView selectedTotal;
-    private RecyclerView monthRecycler;
+    private TextView emptyCategories;
+    private TextView emptyHistory;
 
     @Nullable
     @Override
@@ -44,19 +48,32 @@ public class PeriodFragment extends Fragment {
 
         contentView = view.findViewById(R.id.period_content);
         emptyView = view.findViewById(R.id.period_empty);
+        detailView = view.findViewById(R.id.period_detail_content);
+        promptView = view.findViewById(R.id.period_select_prompt);
         selectedLabel = view.findViewById(R.id.period_selected_label);
         selectedTotal = view.findViewById(R.id.period_selected_total);
-        monthRecycler = view.findViewById(R.id.period_month_recycler);
+        emptyCategories = view.findViewById(R.id.period_empty_categories);
+        emptyHistory = view.findViewById(R.id.period_empty_history);
 
-        monthAdapter = new PeriodMonthAdapter(new PeriodMonthAdapter.Listener() {
-            @Override
-            public void onMonthSelected(PeriodMonthItem item) {
-                viewModel.selectMonth(item.startMillis);
-                openMonthHistory(view, item);
-            }
-        });
-        monthRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        RecyclerView monthRecycler = view.findViewById(R.id.period_month_recycler);
+        RecyclerView categoryRecycler = view.findViewById(R.id.period_category_recycler);
+        RecyclerView historyRecycler = view.findViewById(R.id.period_history_recycler);
+
+        monthAdapter = new PeriodMonthAdapter(item -> viewModel.selectMonth(item.startMillis));
+        categoryAdapter = new PeriodCategoryAdapter();
+        expenseAdapter = new ExpenseHistoryAdapter(expense -> { });
+
+        monthRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
         monthRecycler.setAdapter(monthAdapter);
+        monthRecycler.setNestedScrollingEnabled(false);
+
+        categoryRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
+        categoryRecycler.setAdapter(categoryAdapter);
+        categoryRecycler.setNestedScrollingEnabled(false);
+
+        historyRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
+        historyRecycler.setAdapter(expenseAdapter);
+        historyRecycler.setNestedScrollingEnabled(false);
 
         viewModel.getState().observe(getViewLifecycleOwner(), this::bindState);
     }
@@ -71,20 +88,24 @@ public class PeriodFragment extends Fragment {
         contentView.setVisibility(View.VISIBLE);
         emptyView.setVisibility(View.GONE);
 
-        PeriodMonthItem selectedMonth = state.monthItems.get(state.selectedIndex);
-        monthAdapter.submitList(state.monthItems, selectedMonth.startMillis);
+        long selectedStartMillis = state.selectedIndex >= 0 ? state.monthItems.get(state.selectedIndex).startMillis : Long.MIN_VALUE;
+        monthAdapter.submitList(state.monthItems, selectedStartMillis);
+
+        boolean hasSelection = state.selectedIndex >= 0;
+        promptView.setVisibility(hasSelection ? View.GONE : View.VISIBLE);
+        detailView.setVisibility(hasSelection ? View.VISIBLE : View.GONE);
+        if (!hasSelection) {
+            categoryAdapter.submitList(null);
+            expenseAdapter.submitList(null);
+            return;
+        }
+
         selectedLabel.setText(state.selectedMonthLabel);
         selectedTotal.setText(MoneyFormatter.format(state.selectedMonthTotalMinor, state.currencyCode));
+        categoryAdapter.submitList(state.selectedMonthCategories);
+        expenseAdapter.submitList(state.selectedMonthExpenses);
 
-        monthRecycler.post(() -> monthRecycler.scrollToPosition(state.selectedIndex));
-    }
-
-    private void openMonthHistory(View anchor, PeriodMonthItem item) {
-        Bundle bundle = new Bundle();
-        bundle.putLong(ExpenseListFragment.ARG_RANGE_START_MILLIS, item.startMillis);
-        bundle.putLong(ExpenseListFragment.ARG_RANGE_END_MILLIS, item.endMillis);
-        bundle.putString(ExpenseListFragment.ARG_RANGE_LABEL, item.label);
-        bundle.putString(ExpenseListFragment.ARG_EMPTY_MESSAGE, getString(R.string.period_month_empty));
-        Navigation.findNavController(anchor).navigate(R.id.expenseListFragment, bundle);
+        emptyCategories.setVisibility(state.selectedMonthCategories.isEmpty() ? View.VISIBLE : View.GONE);
+        emptyHistory.setVisibility(state.selectedMonthExpenses.isEmpty() ? View.VISIBLE : View.GONE);
     }
 }

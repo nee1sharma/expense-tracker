@@ -1,40 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="112dp"
-    android:layout_height="match_parent"
-    android:layout_marginEnd="10dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
     android:foreground="?attr/selectableItemBackground"
     app:cardBackgroundColor="@color/surface_soft"
-    app:cardCornerRadius="18dp"
+    app:cardCornerRadius="8dp"
     app:cardElevation="0dp"
     app:strokeColor="@color/surface_variant"
     app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="14dp">
 
         <TextView
             android:id="@+id/period_month_label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:maxLines="1"
-            android:textAppearance="?attr/textAppearanceTitleSmall"
-            android:textStyle="bold" />
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textStyle="bold"
+            tools:text="Jan 2026" />
 
         <TextView
             android:id="@+id/period_month_total"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:gravity="center"
             android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="@color/brand_primary"
+            tools:text="$980.00" />
+
+        <TextView
+            android:id="@+id/period_month_empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/period_month_empty"
             android:textAppearance="?attr/textAppearanceBodySmall"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:visibility="gone"
+            tools:visibility="visible" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -47,7 +47,8 @@ public class PeriodMonthAdapter extends RecyclerView.Adapter<PeriodMonthAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull MonthViewHolder holder, int position) {
-        holder.bind(items.get(position), items.get(position).startMillis == selectedStartMillis);
+        PeriodMonthItem item = items.get(position);
+        holder.bind(item, item.startMillis == selectedStartMillis);
     }
 
     @Override
@@ -59,19 +60,22 @@ public class PeriodMonthAdapter extends RecyclerView.Adapter<PeriodMonthAdapter.
         final MaterialCardView card;
         final TextView label;
         final TextView total;
+        final TextView emptyNote;
 
         MonthViewHolder(@NonNull View itemView) {
             super(itemView);
             card = (MaterialCardView) itemView;
             label = itemView.findViewById(R.id.period_month_label);
             total = itemView.findViewById(R.id.period_month_total);
+            emptyNote = itemView.findViewById(R.id.period_month_empty);
         }
 
         void bind(PeriodMonthItem item, boolean selected) {
             label.setText(item.label);
             total.setText(MoneyFormatter.format(item.totalMinor, item.currencyCode));
+            emptyNote.setVisibility(item.hasExpenses ? View.GONE : View.VISIBLE);
 
-            card.setStrokeWidth(selected ? 3 : 1);
+            card.setStrokeWidth(selected ? 4 : 1);
             card.setStrokeColor(ContextCompat.getColor(itemView.getContext(),
                     selected ? R.color.brand_primary : R.color.surface_variant));
             card.setCardBackgroundColor(ContextCompat.getColor(itemView.getContext(),

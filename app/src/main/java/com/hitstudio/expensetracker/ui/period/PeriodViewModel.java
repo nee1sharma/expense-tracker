@@ -16,10 +16,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-public class  PeriodViewModel extends ViewModel {
+public class PeriodViewModel extends ViewModel {
     private final LiveData<List<Expense>> allExpenses;
     private final MutableLiveData<Long> selectedMonthStartMillis = new MutableLiveData<>();
     private final MediatorLiveData<PeriodScreenState> state = new MediatorLiveData<>();
@@ -59,45 +61,57 @@ public class  PeriodViewModel extends ViewModel {
 
         YearMonth firstMonth = monthOf(expenses.get(0).occurredAt);
         YearMonth lastMonth = monthOf(expenses.get(expenses.size() - 1).occurredAt);
-        List<PeriodMonthItem> monthItems = new ArrayList<>();
+        List<PeriodMonthItem> monthItems = buildMonthItems(expenses, firstMonth, lastMonth);
 
-        YearMonth cursor = firstMonth;
-        while (!cursor.isAfter(lastMonth)) {
-            long startMillis = cursor.atDay(1).atStartOfDay(zoneId).toInstant().toEpochMilli();
-            long endMillis = cursor.plusMonths(1).atDay(1).atStartOfDay(zoneId).toInstant().toEpochMilli();
-            List<Expense> monthExpenses = filterMonth(expenses, startMillis, endMillis);
-            long totalMinor = 0;
-            for (Expense expense : monthExpenses) {
-                if (isExpense(expense)) {
-                    totalMinor += expense.amountMinor;
-                }
-            }
-            monthItems.add(new PeriodMonthItem(
-                    startMillis,
-                    endMillis,
-                    monthFormatter.format(cursor),
-                    totalMinor,
-                    defaultCurrencyCode,
-                    !monthExpenses.isEmpty()
-            ));
-            cursor = cursor.plusMonths(1);
-        }
-
-        Long selectedStart = selectedMonthStartMillis.getValue();
-        int selectedIndex = indexOf(monthItems, selectedStart);
+        int selectedIndex = indexOf(monthItems, selectedMonthStartMillis.getValue());
         if (selectedIndex < 0) {
-            selectedIndex = monthItems.size() - 1;
+            state.setValue(new PeriodScreenState(
+                    true,
+                    monthItems,
+                    -1,
+                    "",
+                    0L,
+                    safeCurrency(defaultCurrencyCode),
+                    Collections.emptyList(),
+                    Collections.emptyList()
+            ));
+            return;
         }
 
         PeriodMonthItem selectedMonth = monthItems.get(selectedIndex);
+        List<Expense> monthExpenses = filterMonth(expenses, selectedMonth.startMillis, selectedMonth.endMillis);
+        String currencyCode = currencyFor(monthExpenses);
         state.setValue(new PeriodScreenState(
                 true,
                 monthItems,
                 selectedIndex,
                 selectedMonth.label,
                 selectedMonth.totalMinor,
-                defaultCurrencyCode
+                currencyCode,
+                buildCategoryItems(monthExpenses, currencyCode),
+                monthExpenses
         ));
+    }
+
+    private List<PeriodMonthItem> buildMonthItems(List<Expense> expenses, YearMonth firstMonth, YearMonth lastMonth) {
+        List<PeriodMonthItem> monthItems = new ArrayList<>();
+        YearMonth cursor = firstMonth;
+        while (!cursor.isAfter(lastMonth)) {
+            long startMillis = cursor.atDay(1).atStartOfDay(zoneId).toInstant().toEpochMilli();
+            long endMillis = cursor.plusMonths(1).atDay(1).atStartOfDay(zoneId).toInstant().toEpochMilli();
+            List<Expense> monthExpenses = filterMonth(expenses, startMillis, endMillis);
+            String currencyCode = currencyFor(monthExpenses);
+            monthItems.add(new PeriodMonthItem(
+                    startMillis,
+                    endMillis,
+                    monthFormatter.format(cursor),
+                    totalExpenseMinor(monthExpenses),
+                    currencyCode,
+                    hasExpenseTransactions(monthExpenses)
+            ));
+            cursor = cursor.plusMonths(1);
+        }
+        return monthItems;
     }
 
     private int indexOf(List<PeriodMonthItem> monthItems, Long selectedStart) {
@@ -123,12 +137,93 @@ public class  PeriodViewModel extends ViewModel {
         return filtered;
     }
 
+    private List<PeriodCategoryItem> buildCategoryItems(List<Expense> expenses, String currencyCode) {
+        Map<Long, CategoryAccumulator> buckets = new LinkedHashMap<>();
+        for (Expense expense : expenses) {
+            if (!isExpense(expense)) {
+                continue;
+            }
+            CategoryAccumulator accumulator = buckets.get(expense.categoryId);
+            if (accumulator == null) {
+                accumulator = new CategoryAccumulator(
+                        expense.categoryId,
+                        emptyToFallback(expense.categoryName, "Uncategorized"),
+                        emptyToFallback(expense.categoryColorHex, "#607D8B")
+                );
+                buckets.put(expense.categoryId, accumulator);
+            }
+            accumulator.totalMinor += expense.amountMinor;
+        }
+
+        List<PeriodCategoryItem> items = new ArrayList<>();
+        for (CategoryAccumulator accumulator : buckets.values()) {
+            items.add(new PeriodCategoryItem(
+                    accumulator.categoryId,
+                    accumulator.categoryName,
+                    accumulator.colorHex,
+                    accumulator.totalMinor,
+                    currencyCode
+            ));
+        }
+        items.sort((left, right) -> Long.compare(right.amountMinor, left.amountMinor));
+        return items;
+    }
+
+    private long totalExpenseMinor(List<Expense> expenses) {
+        long totalMinor = 0L;
+        for (Expense expense : expenses) {
+            if (isExpense(expense)) {
+                totalMinor += expense.amountMinor;
+            }
+        }
+        return totalMinor;
+    }
+
+    private boolean hasExpenseTransactions(List<Expense> expenses) {
+        for (Expense expense : expenses) {
+            if (isExpense(expense)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private YearMonth monthOf(long millis) {
         return YearMonth.from(Instant.ofEpochMilli(millis).atZone(zoneId));
+    }
+
+    private String currencyFor(List<Expense> expenses) {
+        for (Expense expense : expenses) {
+            if (expense.currencyCode != null && !expense.currencyCode.trim().isEmpty()) {
+                return expense.currencyCode;
+            }
+        }
+        return safeCurrency(defaultCurrencyCode);
+    }
+
+    private String safeCurrency(String currencyCode) {
+        return currencyCode == null || currencyCode.trim().isEmpty() ? "USD" : currencyCode;
+    }
+
+    private String emptyToFallback(String value, String fallback) {
+        return value == null || value.trim().isEmpty() ? fallback : value;
     }
 
     private boolean isExpense(Expense expense) {
         TransactionType type = expense.transactionType == null ? TransactionType.EXPENSE : expense.transactionType;
         return type != TransactionType.INCOME;
+    }
+
+    private static final class CategoryAccumulator {
+        final long categoryId;
+        final String categoryName;
+        final String colorHex;
+        long totalMinor;
+
+        CategoryAccumulator(long categoryId, String categoryName, String colorHex) {
+            this.categoryId = categoryId;
+            this.categoryName = categoryName;
+            this.colorHex = colorHex;
+        }
     }
 }
