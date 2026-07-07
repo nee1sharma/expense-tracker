@@ -11,9 +11,10 @@
         android:padding="20dp">
 
         <TextView
+            android:id="@+id/expense_list_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="History"
+            android:text="@string/history_title"
             android:textAppearance="?attr/textAppearanceHeadlineMedium"
             android:textStyle="bold" />
 
@@ -22,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="No transactions yet."
+            android:text="@string/history_empty"
             android:textAppearance="?attr/textAppearanceBodyMedium" />
 
         <androidx.recyclerview.widget.RecyclerView

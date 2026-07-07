@@ -8,6 +8,7 @@ import com.hitstudio.expensetracker.app.AppContainer;
 import com.hitstudio.expensetracker.ui.dashboard.DashboardViewModel;
 import com.hitstudio.expensetracker.ui.list.ExpenseListViewModel;
 import com.hitstudio.expensetracker.ui.logger.ExpenseViewModel;
+import com.hitstudio.expensetracker.ui.period.PeriodViewModel;
 import com.hitstudio.expensetracker.ui.settings.SettingsViewModel;
 
 public class AppViewModelFactory implements ViewModelProvider.Factory {
@@ -29,6 +30,9 @@ public class AppViewModelFactory implements ViewModelProvider.Factory {
         }
         if (modelClass.isAssignableFrom(ExpenseListViewModel.class)) {
             return (T) new ExpenseListViewModel(container);
+        }
+        if (modelClass.isAssignableFrom(PeriodViewModel.class)) {
+            return (T) new PeriodViewModel(container);
         }
         if (modelClass.isAssignableFrom(SettingsViewModel.class)) {
             return (T) new SettingsViewModel(container);

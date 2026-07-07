@@ -78,7 +78,7 @@ public class DashboardFragment extends Fragment {
         view.findViewById(R.id.dashboard_add_expense).setOnClickListener(v ->
                 Navigation.findNavController(view).navigate(R.id.loggerFragment));
         view.findViewById(R.id.dashboard_view_all).setOnClickListener(v ->
-                Navigation.findNavController(view).navigate(R.id.expenseListFragment));
+                Navigation.findNavController(view).navigate(R.id.periodFragment));
 
         viewModel.summary.observe(getViewLifecycleOwner(), this::bindSummary);
         viewModel.recentExpenses.observe(getViewLifecycleOwner(), expenses -> {

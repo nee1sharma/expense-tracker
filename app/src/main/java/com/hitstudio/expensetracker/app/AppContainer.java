@@ -20,6 +20,7 @@ import com.hitstudio.expensetracker.domain.repository.ExpenseWriter;
 import com.hitstudio.expensetracker.domain.service.AggregationService;
 import com.hitstudio.expensetracker.domain.service.StorageMigrationService;
 import com.hitstudio.expensetracker.notify.NotificationHelper;
+import com.hitstudio.expensetracker.util.AppLogger;
 import com.hitstudio.expensetracker.util.concurrent.AppExecutors;
 import com.hitstudio.expensetracker.work.WorkScheduler;
 
@@ -42,6 +43,7 @@ public class AppContainer {
     public final WorkScheduler workScheduler;
 
     public AppContainer(Context context) {
+        AppLogger.i("AppContainer", "Initializing AppContainer");
         Context appContext = context.getApplicationContext();
         executors = new AppExecutors();
         preferences = new AppPreferences(appContext);

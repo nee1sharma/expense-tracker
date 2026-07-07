@@ -22,7 +22,7 @@
     <fragment
         android:id="@+id/periodFragment"
         android:name="com.hitstudio.expensetracker.ui.period.PeriodFragment"
-        android:label="Periods" />
+        android:label="History" />
 
     <fragment
         android:id="@+id/settingsFragment"
