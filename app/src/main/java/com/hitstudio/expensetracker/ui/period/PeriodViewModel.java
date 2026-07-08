@@ -10,6 +10,7 @@ import com.hitstudio.expensetracker.domain.model.Expense;
 import com.hitstudio.expensetracker.domain.model.TransactionType;
 
 import java.time.Instant;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -59,14 +60,26 @@ public class PeriodViewModel extends ViewModel {
         List<Expense> expenses = new ArrayList<>(currentExpenses);
         expenses.sort(Comparator.comparingLong(expense -> expense.occurredAt));
 
+        Year currentYear = Year.now(zoneId);
+        List<Expense> yearExpenses = filterRange(
+                expenses,
+                currentYear.atDay(1).atStartOfDay(zoneId).toInstant().toEpochMilli(),
+                currentYear.plusYears(1).atDay(1).atStartOfDay(zoneId).toInstant().toEpochMilli());
+        String yearCurrencyCode = currencyFor(yearExpenses);
+
         YearMonth firstMonth = monthOf(expenses.get(0).occurredAt);
-        YearMonth lastMonth = monthOf(expenses.get(expenses.size() - 1).occurredAt);
-        List<PeriodMonthItem> monthItems = buildMonthItems(expenses, firstMonth, lastMonth);
+        YearMonth currentMonth = YearMonth.now(zoneId);
+        YearMonth newestMonth = currentMonth.isBefore(firstMonth) ? firstMonth : currentMonth;
+        List<PeriodMonthItem> monthItems = buildMonthItems(expenses, newestMonth, firstMonth);
 
         int selectedIndex = indexOf(monthItems, selectedMonthStartMillis.getValue());
         if (selectedIndex < 0) {
             state.setValue(new PeriodScreenState(
                     true,
+                    String.valueOf(currentYear.getValue()),
+                    totalExpenseMinor(yearExpenses),
+                    yearCurrencyCode,
+                    buildCategoryItems(yearExpenses, yearCurrencyCode),
                     monthItems,
                     -1,
                     "",
@@ -79,27 +92,31 @@ public class PeriodViewModel extends ViewModel {
         }
 
         PeriodMonthItem selectedMonth = monthItems.get(selectedIndex);
-        List<Expense> monthExpenses = filterMonth(expenses, selectedMonth.startMillis, selectedMonth.endMillis);
-        String currencyCode = currencyFor(monthExpenses);
+        List<Expense> monthExpenses = filterRange(expenses, selectedMonth.startMillis, selectedMonth.endMillis);
+        String monthCurrencyCode = currencyFor(monthExpenses);
         state.setValue(new PeriodScreenState(
                 true,
+                String.valueOf(currentYear.getValue()),
+                totalExpenseMinor(yearExpenses),
+                yearCurrencyCode,
+                buildCategoryItems(yearExpenses, yearCurrencyCode),
                 monthItems,
                 selectedIndex,
                 selectedMonth.label,
                 selectedMonth.totalMinor,
-                currencyCode,
-                buildCategoryItems(monthExpenses, currencyCode),
+                monthCurrencyCode,
+                buildCategoryItems(monthExpenses, monthCurrencyCode),
                 monthExpenses
         ));
     }
 
-    private List<PeriodMonthItem> buildMonthItems(List<Expense> expenses, YearMonth firstMonth, YearMonth lastMonth) {
+    private List<PeriodMonthItem> buildMonthItems(List<Expense> expenses, YearMonth newestMonth, YearMonth oldestMonth) {
         List<PeriodMonthItem> monthItems = new ArrayList<>();
-        YearMonth cursor = firstMonth;
-        while (!cursor.isAfter(lastMonth)) {
+        YearMonth cursor = newestMonth;
+        while (!cursor.isBefore(oldestMonth)) {
             long startMillis = cursor.atDay(1).atStartOfDay(zoneId).toInstant().toEpochMilli();
             long endMillis = cursor.plusMonths(1).atDay(1).atStartOfDay(zoneId).toInstant().toEpochMilli();
-            List<Expense> monthExpenses = filterMonth(expenses, startMillis, endMillis);
+            List<Expense> monthExpenses = filterRange(expenses, startMillis, endMillis);
             String currencyCode = currencyFor(monthExpenses);
             monthItems.add(new PeriodMonthItem(
                     startMillis,
@@ -109,7 +126,7 @@ public class PeriodViewModel extends ViewModel {
                     currencyCode,
                     hasExpenseTransactions(monthExpenses)
             ));
-            cursor = cursor.plusMonths(1);
+            cursor = cursor.minusMonths(1);
         }
         return monthItems;
     }
@@ -126,7 +143,7 @@ public class PeriodViewModel extends ViewModel {
         return -1;
     }
 
-    private List<Expense> filterMonth(List<Expense> expenses, long startMillis, long endMillis) {
+    private List<Expense> filterRange(List<Expense> expenses, long startMillis, long endMillis) {
         List<Expense> filtered = new ArrayList<>();
         for (Expense expense : expenses) {
             if (expense.occurredAt >= startMillis && expense.occurredAt < endMillis) {

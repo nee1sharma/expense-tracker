@@ -7,6 +7,10 @@ import java.util.List;
 
 public class PeriodScreenState {
     public final boolean hasTrackingData;
+    public final String yearLabel;
+    public final long yearTotalMinor;
+    public final String yearCurrencyCode;
+    public final List<PeriodCategoryItem> yearCategories;
     public final List<PeriodMonthItem> monthItems;
     public final int selectedIndex;
     public final String selectedMonthLabel;
@@ -16,6 +20,10 @@ public class PeriodScreenState {
     public final List<Expense> selectedMonthExpenses;
 
     public PeriodScreenState(boolean hasTrackingData,
+                             String yearLabel,
+                             long yearTotalMinor,
+                             String yearCurrencyCode,
+                             List<PeriodCategoryItem> yearCategories,
                              List<PeriodMonthItem> monthItems,
                              int selectedIndex,
                              String selectedMonthLabel,
@@ -24,6 +32,10 @@ public class PeriodScreenState {
                              List<PeriodCategoryItem> selectedMonthCategories,
                              List<Expense> selectedMonthExpenses) {
         this.hasTrackingData = hasTrackingData;
+        this.yearLabel = yearLabel == null ? "" : yearLabel;
+        this.yearTotalMinor = yearTotalMinor;
+        this.yearCurrencyCode = yearCurrencyCode == null || yearCurrencyCode.trim().isEmpty() ? "USD" : yearCurrencyCode;
+        this.yearCategories = yearCategories == null ? Collections.emptyList() : yearCategories;
         this.monthItems = monthItems == null ? Collections.emptyList() : monthItems;
         this.selectedIndex = selectedIndex;
         this.selectedMonthLabel = selectedMonthLabel == null ? "" : selectedMonthLabel;
@@ -34,6 +46,18 @@ public class PeriodScreenState {
     }
 
     public static PeriodScreenState empty() {
-        return new PeriodScreenState(false, Collections.emptyList(), -1, "", 0L, "USD", Collections.emptyList(), Collections.emptyList());
+        return new PeriodScreenState(
+                false,
+                "",
+                0L,
+                "USD",
+                Collections.emptyList(),
+                Collections.emptyList(),
+                -1,
+                "",
+                0L,
+                "USD",
+                Collections.emptyList(),
+                Collections.emptyList());
     }
 }

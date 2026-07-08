@@ -22,4 +22,7 @@
     <string name="period_no_category_data">No category expenses for this month.</string>
     <string name="period_expense_history_title">Expense history</string>
     <string name="period_no_month_history">No entries for this month.</string>
+    <string name="period_year_title">Current year</string>
+    <string name="period_year_category_title">Category details for current year</string>
+    <string name="period_no_year_category_data">No category expenses for current year.</string>
 </resources>

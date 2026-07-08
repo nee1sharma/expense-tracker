@@ -22,10 +22,14 @@ import com.hitstudio.expensetracker.util.MoneyFormatter;
 public class PeriodFragment extends Fragment {
     private PeriodViewModel viewModel;
     private PeriodMonthAdapter monthAdapter;
+    private PeriodCategoryAdapter yearCategoryAdapter;
     private PeriodCategoryAdapter categoryAdapter;
     private ExpenseHistoryAdapter expenseAdapter;
     private View contentView;
     private TextView emptyView;
+    private TextView yearLabel;
+    private TextView yearTotal;
+    private TextView emptyYearCategories;
     private View detailView;
     private TextView promptView;
     private TextView selectedLabel;
@@ -48,6 +52,9 @@ public class PeriodFragment extends Fragment {
 
         contentView = view.findViewById(R.id.period_content);
         emptyView = view.findViewById(R.id.period_empty);
+        yearLabel = view.findViewById(R.id.period_year_label);
+        yearTotal = view.findViewById(R.id.period_year_total);
+        emptyYearCategories = view.findViewById(R.id.period_empty_year_categories);
         detailView = view.findViewById(R.id.period_detail_content);
         promptView = view.findViewById(R.id.period_select_prompt);
         selectedLabel = view.findViewById(R.id.period_selected_label);
@@ -55,13 +62,19 @@ public class PeriodFragment extends Fragment {
         emptyCategories = view.findViewById(R.id.period_empty_categories);
         emptyHistory = view.findViewById(R.id.period_empty_history);
 
+        RecyclerView yearCategoryRecycler = view.findViewById(R.id.period_year_category_recycler);
         RecyclerView monthRecycler = view.findViewById(R.id.period_month_recycler);
         RecyclerView categoryRecycler = view.findViewById(R.id.period_category_recycler);
         RecyclerView historyRecycler = view.findViewById(R.id.period_history_recycler);
 
         monthAdapter = new PeriodMonthAdapter(item -> viewModel.selectMonth(item.startMillis));
+        yearCategoryAdapter = new PeriodCategoryAdapter();
         categoryAdapter = new PeriodCategoryAdapter();
         expenseAdapter = new ExpenseHistoryAdapter(expense -> { });
+
+        yearCategoryRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
+        yearCategoryRecycler.setAdapter(yearCategoryAdapter);
+        yearCategoryRecycler.setNestedScrollingEnabled(false);
 
         monthRecycler.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
         monthRecycler.setAdapter(monthAdapter);
@@ -87,6 +100,11 @@ public class PeriodFragment extends Fragment {
 
         contentView.setVisibility(View.VISIBLE);
         emptyView.setVisibility(View.GONE);
+
+        yearLabel.setText(state.yearLabel);
+        yearTotal.setText(MoneyFormatter.format(state.yearTotalMinor, state.yearCurrencyCode));
+        yearCategoryAdapter.submitList(state.yearCategories);
+        emptyYearCategories.setVisibility(state.yearCategories.isEmpty() ? View.VISIBLE : View.GONE);
 
         long selectedStartMillis = state.selectedIndex >= 0 ? state.monthItems.get(state.selectedIndex).startMillis : Long.MIN_VALUE;
         monthAdapter.submitList(state.monthItems, selectedStartMillis);
