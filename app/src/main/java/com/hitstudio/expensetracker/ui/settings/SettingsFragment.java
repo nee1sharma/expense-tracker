@@ -64,6 +64,7 @@ public class SettingsFragment extends Fragment {
         viewModel.getMessage().observe(getViewLifecycleOwner(), result -> {
             if (result != null) {
                 Toast.makeText(requireContext(), result.success ? result.data : result.message, Toast.LENGTH_SHORT).show();
+                viewModel.clearMessage();
             }
         });
     }

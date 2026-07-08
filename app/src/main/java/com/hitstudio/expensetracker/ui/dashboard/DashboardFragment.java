@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,9 +24,13 @@ import com.hitstudio.expensetracker.R;
 import com.hitstudio.expensetracker.domain.model.CategoryBreakdown;
 import com.hitstudio.expensetracker.domain.model.DashboardSummary;
 import com.hitstudio.expensetracker.domain.model.Expense;
+import com.hitstudio.expensetracker.domain.model.TransactionType;
 import com.hitstudio.expensetracker.ui.common.AppViewModelFactory;
 import com.hitstudio.expensetracker.ui.list.ExpenseAdapter;
 import com.hitstudio.expensetracker.util.MoneyFormatter;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 public class DashboardFragment extends Fragment {
     private DashboardViewModel viewModel;
@@ -67,7 +72,7 @@ public class DashboardFragment extends Fragment {
 
             @Override
             public void onDelete(Expense expense) {
-                confirmDelete(expense);
+                showActionsDialog(view, expense);
             }
         });
 
@@ -123,5 +128,54 @@ public class DashboardFragment extends Fragment {
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Delete", (dialog, which) -> viewModel.delete(expense.id))
                 .show();
+    }
+
+
+    private String transactionTitle(Expense expense) {
+        return firstNonBlank(expense.reason, expense.payee, expense.categoryName, "Transaction");
+    }
+
+    private String transactionDetails(Expense expense) {
+        String amount = MoneyFormatter.format(expense.amountMinor, expense.currencyCode);
+        TransactionType type = expense.transactionType == null ? TransactionType.EXPENSE : expense.transactionType;
+        amount = type == TransactionType.INCOME ? "+" + amount : "-" + amount;
+        String category = firstNonBlank(expense.categoryName, "Uncategorized");
+        String date = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(new Date(expense.occurredAt));
+        return category + " | " + amount + " | " + date;
+    }
+
+    private String firstNonBlank(String... values) {
+        for (String value : values) {
+            if (value != null && !value.trim().isEmpty()) {
+                return value.trim();
+            }
+        }
+        return "";
+    }
+
+    private void showActionsDialog(View view, Expense expense) {
+        View actionsView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_expense_actions, null, false);
+        Button updateButton = actionsView.findViewById(R.id.expense_action_edit_button);
+        Button deleteButton = actionsView.findViewById(R.id.expense_action_delete_button);
+        updateButton.setText("Update");
+
+        androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Options for " + transactionTitle(expense))
+                .setMessage(transactionDetails(expense))
+                .setView(actionsView)
+                .create();
+
+        updateButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            Bundle bundle = new Bundle();
+            bundle.putLong("expenseId", expense.id);
+            Navigation.findNavController(view).navigate(R.id.loggerFragment, bundle);
+        });
+        deleteButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            confirmDelete(expense);
+        });
+
+        dialog.show();
     }
 }

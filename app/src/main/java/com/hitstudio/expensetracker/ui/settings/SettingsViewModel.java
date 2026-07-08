@@ -33,6 +33,10 @@ public class SettingsViewModel extends ViewModel {
         return message;
     }
 
+    public void clearMessage() {
+        message.setValue(null);
+    }
+
     public void saveSettings(String currencyCode, PaymentMethod paymentMethod) {
         AppSettings next = new AppSettings(currencyCode, paymentMethod, StorageMode.ROOM_LOCAL, false, java.util.Calendar.MONDAY);
         container.preferences.saveSettings(next);

@@ -35,6 +35,7 @@ public class PeriodFragment extends Fragment {
     private TextView selectedLabel;
     private TextView selectedTotal;
     private TextView emptyCategories;
+    private TextView historyTitle;
     private TextView emptyHistory;
 
     @Nullable
@@ -60,6 +61,7 @@ public class PeriodFragment extends Fragment {
         selectedLabel = view.findViewById(R.id.period_selected_label);
         selectedTotal = view.findViewById(R.id.period_selected_total);
         emptyCategories = view.findViewById(R.id.period_empty_categories);
+        historyTitle = view.findViewById(R.id.period_history_title);
         emptyHistory = view.findViewById(R.id.period_empty_history);
 
         RecyclerView yearCategoryRecycler = view.findViewById(R.id.period_year_category_recycler);
@@ -120,6 +122,7 @@ public class PeriodFragment extends Fragment {
 
         selectedLabel.setText(state.selectedMonthLabel);
         selectedTotal.setText(MoneyFormatter.format(state.selectedMonthTotalMinor, state.currencyCode));
+        historyTitle.setText(getString(R.string.period_expense_history_title_for_month, state.selectedMonthLabel));
         categoryAdapter.submitList(state.selectedMonthCategories);
         expenseAdapter.submitList(state.selectedMonthExpenses);
 

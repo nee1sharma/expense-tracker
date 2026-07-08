@@ -17,7 +17,7 @@ public class DashboardViewModel extends ViewModel {
     public DashboardViewModel(AppContainer container) {
         this.container = container;
         summary = container.expenseReader.observeDashboard();
-        recentExpenses = container.expenseReader.observeRecent(5);
+        recentExpenses = container.expenseReader.observeRecent(10);
     }
 
     public void delete(long id) {

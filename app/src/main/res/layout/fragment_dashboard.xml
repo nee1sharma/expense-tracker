@@ -248,7 +248,7 @@
         android:id="@+id/dashboard_add_expense"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
+        android:layout_gravity="bottom|end"
         android:layout_margin="32dp"
         android:text="Add Transaction"
         app:icon="@drawable/ic_add"
