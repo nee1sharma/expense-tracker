@@ -38,6 +38,7 @@ jobs:
           alias: ${{ secrets.RELEASE_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.RELEASE_STORE_PASSWORD }}
           keyPassword: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          buildToolsVersion: "35.0.0" # Explicitly use a newer version available on the runner
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
