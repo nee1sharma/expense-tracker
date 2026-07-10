@@ -3,7 +3,8 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*' # Trigger on version tags, e.g., v1.0.1, v2.0.0
+      - 'v*' # Trigger on version tags, e.g., v1.0.1
+  workflow_dispatch: # Allows you to manually trigger the build from GitHub Actions tab
 
 jobs:
   release:
@@ -25,6 +26,9 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Accept Android SDK Licenses
+        run: yes | sdkmanager --licenses || true
+
       - name: Build Release APK
         run: ./gradlew assembleRelease
 
@@ -33,5 +37,6 @@ jobs:
         with:
           files: app/build/outputs/apk/release/*.apk
           generate_release_notes: true
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

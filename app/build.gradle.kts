@@ -5,6 +5,10 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+base {
+    archivesName.set("ExpenseTracker")
+}
+
 val versionPropsFile = rootProject.file("version.properties")
 val versionProps = Properties().apply {
     if (versionPropsFile.exists()) {
@@ -35,11 +39,29 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val keystoreProperties = Properties()
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    }
+
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         debug {
             versionNameSuffix = "-debug"
         }
         release {
+            signingConfig = if (keystorePropertiesFile.exists()) signingConfigs.getByName("release") else null
             optimization {
                 enable = false
             }
