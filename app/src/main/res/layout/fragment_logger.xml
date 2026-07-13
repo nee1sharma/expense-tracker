@@ -49,6 +49,8 @@
                 android:inputType="textCapSentences"
                 android:maxLength="120"
                 android:maxLines="1"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:paddingTop="16dp"
                 android:paddingBottom="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
